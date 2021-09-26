@@ -17,11 +17,11 @@ def check():
 
 @flask_app.route('/train/v1/<tenant>', methods=['POST'])
 def train_handler(tenant):
-    return controller.on_train(tenant, request)
+    return controller.on_train(tenant, request.get_json())
 
 @flask_app.route('/predict/v1/<tenant>', methods=['GET'])
 def predict_handler(tenant):
-    return controller.on_predict(tenant, request)
+    return controller.on_predict(tenant, request.get_json())
 
 if __name__ == "__main__":
   flask_app.run()

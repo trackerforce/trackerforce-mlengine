@@ -1,20 +1,25 @@
 import json
 from bson import json_util
-from flask.wrappers import Request
 
 import services.mongodb as db
+from services.dataset_manager import DatasetManager
 
-def on_train(tenant: str, request: Request):
+def on_train(tenant: str, request_body: dict):
+    context_id = request_body['contextId']
     tenant_db = db.get_tenant(tenant)
 
     # TODO: Create DatasetManager
-    # - Validate if dataset exists / return it
-    #   - Create dataset 
     # - Insert example
     # - Train model
     # - Update model
-    return request.get_json()
 
-def on_predict(tenant: str, request: Request):
+    dsm = DatasetManager(tenant_db)
+    ds = dsm.find_create_dataset(request_body)
+    dsm.insert_example(ds, request_body)
+
+    # dsm.train(request_body)
+    return ds
+
+def on_predict(tenant: str, request_body: dict):
     tenant_db = db.get_tenant(tenant)
-    return request.get_json()
+    return request_body
