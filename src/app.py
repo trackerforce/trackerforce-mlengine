@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from flask import Flask, request
-from bson import json_util
+from utils import parse_json 
 
 import controller
 
@@ -13,7 +13,7 @@ flask_app = Flask(__name__)
 
 @flask_app.route('/check', methods=['GET'])
 def check():
-    return json.loads(json_util.dumps({ 'result': 'All good' }))
+    return parse_json({ 'result': 'All good' })
 
 @flask_app.route('/train/v1/<tenant>', methods=['POST'])
 def train_handler(tenant):

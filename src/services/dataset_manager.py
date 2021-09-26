@@ -2,9 +2,9 @@ import pickle
 import time
 import json
 
-from flask.wrappers import Request
-from services import parse_json, train_model
+from services import train_model, predict_entry
 from model.dataset import Dataset
+from utils import parse_json
 
 class DatasetManager():
     """ Handle Dataset operations such as
@@ -18,8 +18,9 @@ class DatasetManager():
 
     def find_create_dataset(self, request_body: dict) -> dict:
         """ Try to find dataset, if it does not exist, create """
-
-        dataset = self._tenant_db.datasets.find_one({ 'context_id': request_body['contextId'] })
+        
+        context_id = request_body['contextId']
+        dataset = self._tenant_db.datasets.find_one({ 'context_id': context_id })
         if dataset is not None:
             return parse_json(dataset)
 
@@ -61,6 +62,19 @@ class DatasetManager():
         )
 
         return accuracy
+
+    def predict(self, request_body: dict):
+        context_id = request_body['contextId']
+        procedure_id = request_body['id']
+
+        model, accuracy = self.__load_saved_model_from_db__(context_id, procedure_id)
+        dataset = self.find_create_dataset(request_body)
+
+        model_info = Dataset.__get_model__(dataset['models'], request_body['id'])
+        sample = Dataset.__prepare_sample__(model_info, request_body['tasks'])
+        
+        prediction = predict_entry(model=model, sample_input=sample)
+        return prediction[0], accuracy
     
     def __create_dataset__(self, request_body: dict) -> Dataset:
         """ Create a new Dataset including one sample collection (ModelInfo) """
@@ -101,3 +115,13 @@ class DatasetManager():
             'accuracy': accuracy,
             'created_at': time.time()
         }, upsert=True)
+
+    def __load_saved_model_from_db__(self, context_id: str, procedure_id: str):
+        """ Load binary model based on Context and Procedure """
+
+        model = self._tenant_db.models.find_one({
+            'context_id': context_id,
+            'procedure_id': procedure_id
+        })
+        
+        return pickle.loads(model['model']), model['accuracy']

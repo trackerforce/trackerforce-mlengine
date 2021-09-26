@@ -1,12 +1,9 @@
-import json
-from bson import json_util
-
-import services.mongodb as db
-from services.dataset_manager import DatasetManager
+from services import DatasetManager
+from services.mongodb import get_tenant
+from services.validator import sanitize_request
 
 def on_train(tenant: str, request_body: dict):
-    context_id = request_body['contextId']
-    tenant_db = db.get_tenant(tenant)
+    tenant_db = get_tenant(tenant)
 
     # Initialize DatasetManager
     dsm = DatasetManager(tenant_db)
@@ -26,5 +23,15 @@ def on_train(tenant: str, request_body: dict):
     }
 
 def on_predict(tenant: str, request_body: dict):
-    tenant_db = db.get_tenant(tenant)
-    return request_body
+    tenant_db = get_tenant(tenant)
+
+    # Initialize DatasetManager
+    dsm = DatasetManager(tenant_db)
+
+    # Retrieve prediction and accuracy
+    predicted, accuracy = dsm.predict(request_body)
+
+    return {
+        'predicted': predicted,
+        'prediction_accuracy': accuracy
+    }

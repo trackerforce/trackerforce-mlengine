@@ -32,3 +32,6 @@ def train_model(model_info: dict, dataset: []):
     except Exception as e:
         print('Model requires more samples to be trained')
         return None, 0
+
+def predict_entry(model: DecisionTreeClassifier, sample_input):
+    return model.predict([sample_input])
