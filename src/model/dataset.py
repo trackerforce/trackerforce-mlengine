@@ -1,11 +1,11 @@
 import json
 
-from model.model import Model
+from model.model_info import ModelInfo
 
 class Dataset():
     def __init__(self, request: dict):
         self.context_id = request['contextId']
-        self.models = [Model(request)]
+        self.models = [ModelInfo(request)]
 
     def toJSON(self):
         return json.dumps(self, default = lambda o: o.__dict__, 

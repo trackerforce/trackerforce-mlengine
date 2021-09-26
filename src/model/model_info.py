@@ -1,10 +1,8 @@
-class Model():
+class ModelInfo():
     def __init__(self, request: dict):
         self.procedure_id = request['id']
         self.collection_name = f'samples_{self.procedure_id}'
-        self.accuracy = 0.0
-        self.model: [bytes] = None
-        self.dataset_features: [str] = Model.__read_features__(request)
+        self.dataset_features: [str] = ModelInfo.__read_features__(request)
 
     @staticmethod
     def __read_features__(request: dict):
@@ -16,7 +14,7 @@ class Model():
             task_learn = task['learn']
 
             if task_learn:
-                Model.__read_options__(features, task_id, task)
+                ModelInfo.__read_options__(features, task_id, task)
 
         return features
 
