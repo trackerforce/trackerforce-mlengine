@@ -30,8 +30,11 @@ class DatasetManager():
             raise Exception('Model not found')
 
         sample = Dataset.__prepare_sample__(model, request_body['tasks'])
-        # TODO: Retrieve sample collection and insert new sampe
-        print(sample)
+        self.__add_sample_collection__(
+            collection=model['collection_name'],
+            resolution=request_body['resolution'],
+            sample=sample
+        )
 
     def train(self, request: dict):
         pass
@@ -41,26 +44,8 @@ class DatasetManager():
         res = self._tenant_db.datasets.insert_one(json.loads(dataset.toJSON()))
         return dataset
 
-    def __save_model_to_db__(self, model, model_name):
-        pickled_model = pickle.dumps(model)
-        
-        info = self._tenant_db.insert_one({ model_name: pickled_model, 'name': model_name, 'created_time': time.time() })
-        print(info.inserted_id, ' saved with this id successfully!')
-        
-        details = {
-            'inserted_id': info.inserted_id,
-            'model_name': model_name,
-            'created_time': time.time()
-        }
-        
-        return details
-
-    def __load_saved_model_from_db__(self, model_name):
-        json_data = {}
-
-        data = self._tenant_db.find({ 'name': model_name })
-        for i in data:
-            json_data = i
-
-        pickled_model = json_data[model_name]
-        return pickle.loads(pickled_model)
+    def __add_sample_collection__(self, collection, sample, resolution):
+        sample_collection = self._tenant_db[collection].insert_one({
+            'resolution': resolution,
+            'data': sample
+        })
