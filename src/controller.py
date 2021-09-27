@@ -28,10 +28,17 @@ def on_predict(tenant: str, request_body: dict):
     # Initialize DatasetManager
     dsm = DatasetManager(tenant_db)
 
-    # Retrieve prediction and accuracy
-    predicted, accuracy = dsm.predict(request_body)
+    try:
+        # Retrieve prediction and accuracy
+        predicted, accuracy = dsm.predict(request_body)
 
-    return {
-        'predicted': predicted,
-        'prediction_accuracy': accuracy
-    }
+        return {
+            'predicted': predicted,
+            'prediction_accuracy': accuracy
+        }
+    except Exception as e:
+        print(e)
+        return {
+            'predicted': None,
+            'prediction_accuracy': 0
+        }

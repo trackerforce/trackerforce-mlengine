@@ -19,7 +19,7 @@ class DatasetManager():
     def find_create_dataset(self, request_body: dict) -> dict:
         """ Try to find dataset, if it does not exist, create """
         
-        context_id = request_body['contextId']
+        context_id = request_body['context_id']
         dataset = self._tenant_db.datasets.find_one({ 'context_id': context_id })
         if dataset is not None:
             return parse_json(dataset)
@@ -64,10 +64,14 @@ class DatasetManager():
         return accuracy
 
     def predict(self, request_body: dict):
-        context_id = request_body['contextId']
+        context_id = request_body['context_id']
         procedure_id = request_body['id']
 
         model, accuracy = self.__load_saved_model_from_db__(context_id, procedure_id)
+        
+        if accuracy == 0 or model is None:
+            return None, 0
+
         dataset = self.find_create_dataset(request_body)
 
         model_info = Dataset.__get_model__(dataset['models'], request_body['id'])

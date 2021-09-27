@@ -17,11 +17,19 @@ def check():
 
 @flask_app.route('/train/v1/<tenant>', methods=['POST'])
 def train_handler(tenant):
-    return controller.on_train(tenant, request.get_json())
+    try:
+        return controller.on_train(tenant, request.get_json())
+    except Exception as e:
+        print(e)
+        return parse_json({ 'error': 'Something went wrong' })
 
-@flask_app.route('/predict/v1/<tenant>', methods=['GET'])
+@flask_app.route('/predict/v1/<tenant>', methods=['POST'])
 def predict_handler(tenant):
-    return controller.on_predict(tenant, request.get_json())
+    try:
+        return controller.on_predict(tenant, request.get_json())
+    except Exception as e:
+        print(e)
+        return parse_json({ 'error': 'Something went wrong' })
 
 if __name__ == "__main__":
   flask_app.run()

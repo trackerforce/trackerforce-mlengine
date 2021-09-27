@@ -4,7 +4,7 @@ from model.model_info import ModelInfo
 
 class Dataset():
     def __init__(self, request: dict):
-        self.context_id = request['contextId']
+        self.context_id = request['context_id']
         self.models = [ModelInfo(request)]
 
     def toJSON(self):
