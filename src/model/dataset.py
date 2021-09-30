@@ -36,6 +36,6 @@ class Dataset():
                     if feature_data != 'value':
                         data.append(1) if feature_data == task['response'] else data.append(0)
                     else:
-                        data.append(float(task['response']))
+                        data.append(task['response'])
 
         return data
