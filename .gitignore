@@ -20,6 +20,6 @@ cover
 target/
 
 # Virtual Env / IDE Settings
-mlenv/
+mlenv311/
 .vscode
 .mypy_cache
