@@ -25,14 +25,14 @@ class DatasetManager():
             return parse_json(dataset)
 
         dataset = self.__create_dataset__(request_body)
-        return json.loads(dataset.toJSON())
+        return json.loads(dataset.to_json())
 
     def insert_example(self, dataset: dict, request_body: dict) -> dict:
         """ Transform sample input and insert it to the dataset collection """
 
         model_info = Dataset.__get_model__(dataset['models'], request_body['id'])
         if model_info is None:
-            raise Exception('Model Info not found')
+            raise ValueError('Model Info not found')
 
         sample = Dataset.__prepare_sample__(model_info, request_body['tasks'])
         self.__add_sample_collection__(
@@ -75,6 +75,8 @@ class DatasetManager():
         dataset = self.find_create_dataset(request_body)
 
         model_info = Dataset.__get_model__(dataset['models'], request_body['id'])
+        if model_info is None:
+            return None, 0
         sample = Dataset.__prepare_sample__(model_info, request_body['tasks'])
         
         prediction = predict_entry(model=model, sample_input=sample)
@@ -84,12 +86,12 @@ class DatasetManager():
         """ Create a new Dataset including one sample collection (ModelInfo) """
 
         dataset = Dataset(request = request_body)
-        self._tenant_db.datasets.insert_one(json.loads(dataset.toJSON()))
+        self._tenant_db.datasets.insert_one(json.loads(dataset.to_json()))
         return dataset
 
     def __add_sample_collection__(self, 
         collection: str, 
-        sample: [], 
+        sample: list, 
         resolution: str,
         model_info: dict
     ):
@@ -99,7 +101,7 @@ class DatasetManager():
         for idx, feature in enumerate(model_info['dataset_features']):
             sample_input[feature] = sample[idx]
 
-        sample_collection = self._tenant_db[collection].insert_one({
+        self._tenant_db[collection].insert_one({
             **sample_input,
             'resolution': resolution
         })

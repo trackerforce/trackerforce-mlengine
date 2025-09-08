@@ -1,6 +1,5 @@
 from services import DatasetManager
 from services.mongodb import get_tenant
-from services.validator import sanitize_request
 
 def on_train(tenant: str, request_body: dict):
     tenant_db = get_tenant(tenant)

@@ -1,11 +1,10 @@
 import pandas as pd
 
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 from sklearn.tree import DecisionTreeClassifier
 
-def train_model(model_info: dict, dataset: []):
+def train_model(model_info: dict, dataset: list):
     """ 
         Train dataset based on the model info.
         Return bynary model and accuracy score
@@ -30,7 +29,7 @@ def train_model(model_info: dict, dataset: []):
 
         return model, accuracy
     except Exception as e:
-        print('Model requires more samples to be trained')
+        print('Model requires more samples to be trained.', e)
         return None, 0
 
 def predict_entry(model: DecisionTreeClassifier, sample_input):

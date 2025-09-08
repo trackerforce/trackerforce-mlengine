@@ -4,7 +4,7 @@ class ModelInfo():
     def __init__(self, request: dict):
         self.procedure_id = request['id']
         self.collection_name = f'samples_{generate_id()}'
-        self.dataset_features: [str] = ModelInfo.__read_features__(request)
+        self.dataset_features: list[str] = ModelInfo.__read_features__(request)
 
     @staticmethod
     def __read_features__(request: dict):
@@ -21,7 +21,7 @@ class ModelInfo():
         return features
 
     @staticmethod
-    def __read_options__(features: [], task_id: str, task: dict):
+    def __read_options__(features: list[str], task_id: str, task: dict):
         task_options = task.get('options', None)
         if task_options is None:
             features.append(f'{task_id}:value')
