@@ -1,3 +1,5 @@
+""" Dataset Manager Service """
+
 import pickle
 import time
 import json
@@ -18,7 +20,7 @@ class DatasetManager():
 
     def find_create_dataset(self, request_body: dict) -> dict:
         """ Try to find dataset, if it does not exist, create """
-        
+
         context_id = request_body['context_id']
         dataset = self._tenant_db.datasets.find_one({ 'context_id': context_id })
         if dataset is not None:
@@ -45,30 +47,31 @@ class DatasetManager():
         return model_info
 
     def train_update(self, dataset: dict, model_info: dict):
-        """ 
+        """
             Retrieve samples from the DB and send to the ML engine to train the model.
             Returns the accuracy
         """
 
         collection = model_info['collection_name']
         samples = self._tenant_db[collection].find({}, { '_id': False })
-        
+
         model, accuracy = train_model(model_info, samples)
         self.__save_model_to_db__(
-            dataset=dataset, 
+            dataset=dataset,
             model_info=model_info,
-            model=model, 
+            model=model,
             accuracy=accuracy * 100
         )
 
         return accuracy
 
     def predict(self, request_body: dict):
+        """ Predict the outcome for a given sample input """
         context_id = request_body['context_id']
         procedure_id = request_body['id']
 
         model, accuracy = self.__load_saved_model_from_db__(context_id, procedure_id)
-        
+
         if accuracy == 0 or model is None:
             return None, 0
 
@@ -78,10 +81,10 @@ class DatasetManager():
         if model_info is None:
             return None, 0
         sample = Dataset.__prepare_sample__(model_info, request_body['tasks'])
-        
+
         prediction = predict_entry(model=model, sample_input=sample)
         return prediction[0], accuracy
-    
+
     def __create_dataset__(self, request_body: dict) -> Dataset:
         """ Create a new Dataset including one sample collection (ModelInfo) """
 
@@ -89,14 +92,14 @@ class DatasetManager():
         self._tenant_db.datasets.insert_one(json.loads(dataset.to_json()))
         return dataset
 
-    def __add_sample_collection__(self, 
-        collection: str, 
-        sample: list, 
+    def __add_sample_collection__(self,
+        collection: str,
+        sample: list,
         resolution: str,
         model_info: dict
     ):
         """ Add new sample to DB """
-        
+
         sample_input = {}
         for idx, feature in enumerate(model_info['dataset_features']):
             sample_input[feature] = sample[idx]
@@ -129,5 +132,5 @@ class DatasetManager():
             'context_id': context_id,
             'procedure_id': procedure_id
         })
-        
+
         return pickle.loads(model['model']), model['accuracy']

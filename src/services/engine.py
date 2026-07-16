@@ -1,3 +1,5 @@
+""" Engine Service """
+
 import pandas as pd
 
 from sklearn.model_selection import train_test_split
@@ -5,11 +7,11 @@ from sklearn.metrics import accuracy_score
 from sklearn.tree import DecisionTreeClassifier
 
 def train_model(model_info: dict, dataset: list):
-    """ 
+    """
         Train dataset based on the model info.
         Return bynary model and accuracy score
     """
-    
+
     dataset_features = model_info['dataset_features']
     dataset_features.append('resolution')
     attributes = len(dataset_features) - 1

@@ -1,6 +1,8 @@
+""" ModelInfo class """
 from utils import generate_id
 
 class ModelInfo():
+    """ Class to store model information """
     def __init__(self, request: dict):
         self.procedure_id = request['id']
         self.collection_name = f'samples_{generate_id()}'

@@ -1,14 +1,17 @@
+""" Dataset class """
 import json
 
 from model.model_info import ModelInfo
 
 class Dataset():
+    """ Dataset class """
     def __init__(self, request: dict):
         self.context_id = request['context_id']
         self.models = [ModelInfo(request)]
 
     def to_json(self):
-        return json.dumps(self, default = lambda o: o.__dict__, 
+        """ Returns the JSON representation of the Dataset object. """
+        return json.dumps(self, default = lambda o: o.__dict__,
             sort_keys = True, indent = 4)
 
     @staticmethod
@@ -29,6 +32,7 @@ class Dataset():
 
     @staticmethod
     def process_task_feature(tasks, data, feature):
+        """" Processes a single feature for all tasks and appends the results to the data list. """
         for task in tasks:
             task_id = task['id']
             task_learn = task['learn']
